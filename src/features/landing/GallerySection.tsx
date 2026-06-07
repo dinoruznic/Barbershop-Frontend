@@ -1,7 +1,7 @@
-import barberShop1 from '../../assets/barberShop1.jpg'
-import beardCut from '../../assets/beardCut.jpg'
-import equipment from '../../assets/equipment.jpg'
-import fadeCut from '../../assets/fadeCut.jpg'
+import barberShop1 from '../../assets/optimized/barberShop1-gallery.webp'
+import beardCut from '../../assets/optimized/beardCut-gallery.webp'
+import equipment from '../../assets/optimized/equipment-gallery.webp'
+import fadeCut from '../../assets/optimized/fadeCut-gallery.webp'
 
 const galleryItems = [
   { title: 'Fade Cut', image: fadeCut },
@@ -31,6 +31,8 @@ function GallerySection() {
               <img
                 src={item.image}
                 alt={item.title}
+                loading="lazy"
+                decoding="async"
                 className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />

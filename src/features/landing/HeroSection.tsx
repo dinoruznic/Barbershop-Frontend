@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import barberShopImage from '../../assets/barberShop1.jpg'
+import barberShopImage from '../../assets/optimized/barberShop1-hero.webp'
 import LoginCard from './LoginCard'
 
 function HeroSection() {
