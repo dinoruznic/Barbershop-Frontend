@@ -149,7 +149,7 @@ function LoginCard({ mode, highlighted = false }: LoginCardProps) {
       email: loginValues.email.trim(),
       password: loginValues.password,
     })
-    navigate('/app', { replace: true })
+    navigate('/app/dashboard', { replace: true })
   }
 
   const handleRegisterSubmit = async () => {
