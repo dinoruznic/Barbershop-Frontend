@@ -1,3 +1,4 @@
+import StatusBadge from '../../components/common/StatusBadge'
 import { buttonStyles } from '../../components/common/buttonStyles'
 import type {
   BarberOption,
@@ -10,9 +11,18 @@ interface BookingSummaryProps {
   barber?: BarberOption
   date?: DateOption
   time: string
+  isPrepared: boolean
+  onConfirm: () => void
 }
 
-function BookingSummary({ service, barber, date, time }: BookingSummaryProps) {
+function BookingSummary({
+  service,
+  barber,
+  date,
+  time,
+  isPrepared,
+  onConfirm,
+}: BookingSummaryProps) {
   const isComplete = Boolean(service && barber && date && time)
 
   return (
@@ -29,6 +39,7 @@ function BookingSummary({ service, barber, date, time }: BookingSummaryProps) {
         <button
           type="button"
           disabled={!isComplete}
+          onClick={onConfirm}
           className={buttonStyles.primary}
         >
           Potvrdi termin
@@ -54,10 +65,33 @@ function BookingSummary({ service, barber, date, time }: BookingSummaryProps) {
         ))}
       </dl>
 
-      <p className="mt-4 text-xs leading-5 text-stone-500">
-        Potvrda termina će biti povezana sa backendom kada rezervacijski tok
-        bude spreman.
-      </p>
+      <div className="mt-5 rounded-2xl border border-amber-200/10 bg-black/25 p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-bold text-stone-100">
+              Status nakon slanja zahtjeva
+            </p>
+            <p className="mt-1 text-sm leading-6 text-stone-400">
+              Backend kreira rezervaciju kao zahtjev na čekanju, zatim frizer ili
+              vlasnik može potvrditi ili otkazati termin.
+            </p>
+          </div>
+          <StatusBadge label="Na čekanju" tone="warning" />
+        </div>
+      </div>
+
+      {isPrepared && (
+        <div className="mt-5 rounded-2xl border border-emerald-300/20 bg-emerald-300/10 p-4">
+          <p className="font-bold text-emerald-100">
+            Zahtjev za termin je spreman.
+          </p>
+          <p className="mt-2 text-sm leading-6 text-emerald-50/75">
+            Nakon povezivanja sa backendom, frizer će moći potvrditi ili odbiti
+            termin. Mogući statusi su: Na čekanju, Potvrđen, Otkazan, Završen i
+            Nije se pojavio.
+          </p>
+        </div>
+      )}
     </section>
   )
 }

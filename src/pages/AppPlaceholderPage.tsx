@@ -1,7 +1,5 @@
 import { useLocation } from 'react-router-dom'
 import PlaceholderPage from '../components/common/PlaceholderPage'
-import EmployeeDashboardPlaceholder from '../features/employee/EmployeeDashboardPlaceholder'
-import OwnerDashboardPlaceholder from '../features/owner/OwnerDashboardPlaceholder'
 import { pageMetadata } from '../routes/appNavigation'
 
 const clientPlaceholderItems: Record<string, string[]> = {
@@ -17,30 +15,8 @@ const clientPlaceholderItems: Record<string, string[]> = {
   '/app/profile': ['Lični podaci', 'Kontakt', 'Sigurnost naloga'],
 }
 
-const ownerPaths = new Set([
-  '/app/employees',
-  '/app/inventory',
-  '/app/payments',
-  '/app/analytics',
-  '/app/administration',
-])
-
-const employeePaths = new Set([
-  '/app/schedule',
-  '/app/time-off',
-  '/app/assigned-appointments',
-])
-
 function AppPlaceholderPage() {
   const location = useLocation()
-
-  if (ownerPaths.has(location.pathname)) {
-    return <OwnerDashboardPlaceholder />
-  }
-
-  if (employeePaths.has(location.pathname)) {
-    return <EmployeeDashboardPlaceholder />
-  }
 
   const metadata =
     pageMetadata[location.pathname] ?? pageMetadata['/app/dashboard']

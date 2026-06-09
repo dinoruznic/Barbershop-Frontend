@@ -29,14 +29,14 @@ function ServiceSelection({
               key={service.id}
               type="button"
               onClick={() => onSelect(service.id)}
-              className={`rounded-2xl border p-4 text-left transition-all duration-300 ${
+              className={`flex min-h-[190px] flex-col rounded-2xl border p-4 text-left transition-all duration-300 ${
                 isSelected
                   ? 'border-amber-200/50 bg-amber-100/10 text-stone-50 shadow-[0_0_30px_rgba(245,213,145,0.10)]'
                   : 'border-amber-200/10 bg-black/25 text-stone-300 hover:border-amber-200/30 hover:bg-black/35'
               }`}
             >
               <span className="block text-base font-bold">{service.name}</span>
-              <span className="mt-2 block text-sm leading-6 text-stone-400">
+              <span className="mt-2 block flex-1 text-sm leading-6 text-stone-400">
                 {service.description}
               </span>
               <span className="mt-4 flex items-center justify-between text-xs font-semibold uppercase tracking-[0.18em] text-amber-100">

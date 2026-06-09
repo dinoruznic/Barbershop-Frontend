@@ -1,9 +1,28 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import MainFrame from './components/layout/MainFrame'
 import BookAppointmentPage from './features/appointments/BookAppointmentPage'
-import ClientDashboard from './features/client/ClientDashboard'
+import MyAppointmentsPage from './features/appointments/MyAppointmentsPage'
+import RoleDashboard from './features/RoleDashboard'
+import ProfilePage from './features/client/ProfilePage'
+import EmployeeAppointmentsPage from './features/employee/EmployeeAppointmentsPage'
+import EmployeeDashboard from './features/employee/EmployeeDashboard'
+import EmployeeProfilePage from './features/employee/EmployeeProfilePage'
+import EmployeeSchedulePage from './features/employee/EmployeeSchedulePage'
+import EmployeeServicesPage from './features/employee/EmployeeServicesPage'
+import EmployeeTimeOffPage from './features/employee/EmployeeTimeOffPage'
+import OwnerAnalyticsPage from './features/owner/OwnerAnalyticsPage'
+import OwnerAppointmentsPage from './features/owner/OwnerAppointmentsPage'
+import OwnerDashboard from './features/owner/OwnerDashboard'
+import OwnerEmployeesPage from './features/owner/OwnerEmployeesPage'
+import OwnerInventoryPage from './features/owner/OwnerInventoryPage'
+import OwnerPaymentsPage from './features/owner/OwnerPaymentsPage'
+import OwnerReviewsPage from './features/owner/OwnerReviewsPage'
+import OwnerServicesPage from './features/owner/OwnerServicesPage'
+import OwnerSettingsPage from './features/owner/OwnerSettingsPage'
+import ReviewsPage from './features/reviews/ReviewsPage'
+import FavoriteServicesPage from './features/services/FavoriteServicesPage'
+import ServicesPage from './features/services/ServicesPage'
 import HomePage from './pages/HomePage'
-import AppPlaceholderPage from './pages/AppPlaceholderPage'
 
 function App() {
   return (
@@ -12,22 +31,30 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/app" element={<MainFrame />}>
           <Route index element={<Navigate to="/app/dashboard" replace />} />
-          <Route path="dashboard" element={<ClientDashboard />} />
+          <Route path="dashboard" element={<RoleDashboard />} />
           <Route path="book-appointment" element={<BookAppointmentPage />} />
-          <Route path="my-appointments" element={<AppPlaceholderPage />} />
-          <Route path="favorite-services" element={<AppPlaceholderPage />} />
-          <Route path="services" element={<AppPlaceholderPage />} />
-          <Route path="reviews" element={<AppPlaceholderPage />} />
-          <Route path="notifications" element={<AppPlaceholderPage />} />
-          <Route path="profile" element={<AppPlaceholderPage />} />
-          <Route path="schedule" element={<AppPlaceholderPage />} />
-          <Route path="time-off" element={<AppPlaceholderPage />} />
-          <Route path="assigned-appointments" element={<AppPlaceholderPage />} />
-          <Route path="employees" element={<AppPlaceholderPage />} />
-          <Route path="inventory" element={<AppPlaceholderPage />} />
-          <Route path="payments" element={<AppPlaceholderPage />} />
-          <Route path="analytics" element={<AppPlaceholderPage />} />
-          <Route path="administration" element={<AppPlaceholderPage />} />
+          <Route path="my-appointments" element={<MyAppointmentsPage />} />
+          <Route path="favorite-services" element={<FavoriteServicesPage />} />
+          <Route path="services" element={<ServicesPage />} />
+          <Route path="reviews" element={<ReviewsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+
+          <Route path="owner/dashboard" element={<OwnerDashboard />} />
+          <Route path="owner/appointments" element={<OwnerAppointmentsPage />} />
+          <Route path="owner/employees" element={<OwnerEmployeesPage />} />
+          <Route path="owner/services" element={<OwnerServicesPage />} />
+          <Route path="owner/inventory" element={<OwnerInventoryPage />} />
+          <Route path="owner/payments" element={<OwnerPaymentsPage />} />
+          <Route path="owner/analytics" element={<OwnerAnalyticsPage />} />
+          <Route path="owner/reviews" element={<OwnerReviewsPage />} />
+          <Route path="owner/settings" element={<OwnerSettingsPage />} />
+
+          <Route path="employee/dashboard" element={<EmployeeDashboard />} />
+          <Route path="employee/schedule" element={<EmployeeSchedulePage />} />
+          <Route path="employee/appointments" element={<EmployeeAppointmentsPage />} />
+          <Route path="employee/time-off" element={<EmployeeTimeOffPage />} />
+          <Route path="employee/services" element={<EmployeeServicesPage />} />
+          <Route path="employee/profile" element={<EmployeeProfilePage />} />
         </Route>
         <Route
           path="/dashboard"

@@ -3,9 +3,10 @@ import type { NavigationGroup } from '../../types/navigation'
 
 interface AppSidebarProps {
   navigationGroups: NavigationGroup[]
+  workspaceLabel: string
 }
 
-function AppSidebar({ navigationGroups }: AppSidebarProps) {
+function AppSidebar({ navigationGroups, workspaceLabel }: AppSidebarProps) {
   return (
     <aside className="flex w-full flex-col border-b border-amber-200/10 bg-black/35 p-5 backdrop-blur-xl lg:fixed lg:left-0 lg:top-0 lg:z-20 lg:h-screen lg:w-[280px] lg:border-b-0 lg:border-r">
       <div className="shrink-0">
@@ -18,7 +19,7 @@ function AppSidebar({ navigationGroups }: AppSidebarProps) {
               Classic Cuts
             </span>
             <span className="block text-xs uppercase tracking-[0.28em] text-amber-200/70">
-              Moj prostor
+              {workspaceLabel}
             </span>
           </span>
         </div>

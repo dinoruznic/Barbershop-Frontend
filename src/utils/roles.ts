@@ -18,9 +18,17 @@ export function getPrimaryRole(user: AppUser | null) {
     return 'CLIENT'
   }
 
+  if (hasRole(user, 'OWNER')) {
+    return 'OWNER'
+  }
+
+  if (hasRole(user, 'EMPLOYEE')) {
+    return 'EMPLOYEE'
+  }
+
   if (hasRole(user, 'CLIENT')) {
     return 'CLIENT'
   }
 
-  return normalizeRole(user.roles[0])
+  return 'CLIENT'
 }

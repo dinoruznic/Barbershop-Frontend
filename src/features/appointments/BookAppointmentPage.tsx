@@ -1,4 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+import { getServices } from '../../api/servicesApi'
 import BarberSelection from './BarberSelection'
 import BookingSummary from './BookingSummary'
 import type {
@@ -7,33 +9,13 @@ import type {
   DateOption,
   TimeSlot,
 } from './bookingTypes'
-import DateSelection from './DateSelection'
+import DateCalendar from './DateCalendar'
 import ServiceSelection from './ServiceSelection'
 import TimeSlotGrid from './TimeSlotGrid'
 
-const services: BookingServiceOption[] = [
-  {
-    id: 'classic-cut',
-    name: 'Klasično šišanje',
-    duration: '45 min',
-    price: '25 KM',
-    description: 'Uredan rez, pranje i završno stiliziranje.',
-  },
-  {
-    id: 'fade-cut',
-    name: 'Fade šišanje',
-    duration: '60 min',
-    price: '35 KM',
-    description: 'Precizan fade, konture i finalni styling.',
-  },
-  {
-    id: 'beard-trim',
-    name: 'Uređivanje brade',
-    duration: '30 min',
-    price: '18 KM',
-    description: 'Oblikovanje brade, linija i njega kože.',
-  },
-]
+interface BookingLocationState {
+  selectedServiceId?: string
+}
 
 const barbers: BarberOption[] = [
   { id: 'amir', name: 'Amir K.', specialty: 'Fade i kratke forme' },
@@ -54,41 +36,129 @@ const timeSlots: TimeSlot[] = [
   { value: '17:30', status: 'available' },
 ]
 
+const monthNames = [
+  'Januar',
+  'Februar',
+  'Mart',
+  'April',
+  'Maj',
+  'Juni',
+  'Juli',
+  'August',
+  'Septembar',
+  'Oktobar',
+  'Novembar',
+  'Decembar',
+]
+
 const dayLabels = ['Ned', 'Pon', 'Uto', 'Sri', 'Čet', 'Pet', 'Sub']
 
-function getNextSevenDays(): DateOption[] {
-  return Array.from({ length: 7 }, (_, index) => {
-    const date = new Date()
-    date.setDate(date.getDate() + index)
+function createDateOption(date: Date): DateOption {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
 
-    return {
-      value: date.toISOString().slice(0, 10),
-      day: dayLabels[date.getDay()],
-      label: date.toLocaleDateString('bs-BA', {
-        day: '2-digit',
-        month: 'short',
-      }),
-    }
-  })
+  return {
+    value: `${year}-${month}-${day}`,
+    day: dayLabels[date.getDay()],
+    label: `${day}. ${monthNames[date.getMonth()]}`,
+  }
+}
+
+function mapServiceToBookingOption(service: {
+  id: number
+  name: string
+  durationMinutes: number
+  price: number
+  description?: string | null
+}): BookingServiceOption {
+  return {
+    id: String(service.id),
+    name: service.name,
+    duration: `${service.durationMinutes} min`,
+    price: `${service.price.toFixed(service.price % 1 === 0 ? 0 : 2)} KM`,
+    description:
+      service.description ||
+      'Opis usluge će biti prikazan nakon dopune podataka.',
+  }
 }
 
 function BookAppointmentPage() {
-  const dates = useMemo(() => getNextSevenDays(), [])
-  const [selectedServiceId, setSelectedServiceId] = useState(services[0].id)
+  const location = useLocation()
+  const locationState = location.state as BookingLocationState | null
+  const [services, setServices] = useState<BookingServiceOption[]>([])
+  const [selectedServiceId, setSelectedServiceId] = useState('')
   const [selectedBarberId, setSelectedBarberId] = useState(barbers[0].id)
-  const [selectedDate, setSelectedDate] = useState(dates[0].value)
+  const [selectedDate, setSelectedDate] = useState<DateOption>(
+    createDateOption(new Date()),
+  )
   const [selectedTime, setSelectedTime] = useState('')
+  const [isBookingPrepared, setIsBookingPrepared] = useState(false)
+  const [isLoadingServices, setIsLoadingServices] = useState(true)
+  const [servicesError, setServicesError] = useState('')
 
-  const selectedService = services.find(
-    (service) => service.id === selectedServiceId,
+  useEffect(() => {
+    let isMounted = true
+
+    async function loadServices() {
+      setIsLoadingServices(true)
+      setServicesError('')
+
+      try {
+        const response = await getServices({ active: true })
+        const bookingServices = response.items.map(mapServiceToBookingOption)
+
+        if (!isMounted) return
+
+        setServices(bookingServices)
+        setSelectedServiceId((currentServiceId) => {
+          const requestedServiceId = locationState?.selectedServiceId
+          const requestedServiceExists = bookingServices.some(
+            (service) => service.id === requestedServiceId,
+          )
+          const currentServiceExists = bookingServices.some(
+            (service) => service.id === currentServiceId,
+          )
+
+          if (requestedServiceId && requestedServiceExists) {
+            return requestedServiceId
+          }
+
+          if (currentServiceExists) {
+            return currentServiceId
+          }
+
+          return bookingServices[0]?.id ?? ''
+        })
+      } catch {
+        if (isMounted) {
+          setServicesError('Usluge trenutno nisu dostupne. Pokušajte ponovo kasnije.')
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingServices(false)
+        }
+      }
+    }
+
+    loadServices()
+
+    return () => {
+      isMounted = false
+    }
+  }, [locationState?.selectedServiceId])
+
+  const selectedService = useMemo(
+    () => services.find((service) => service.id === selectedServiceId),
+    [selectedServiceId, services],
   )
   const selectedBarber = barbers.find(
     (barber) => barber.id === selectedBarberId,
   )
-  const selectedDateOption = dates.find((date) => date.value === selectedDate)
 
   const resetSelectedTime = () => {
     setSelectedTime('')
+    setIsBookingPrepared(false)
   }
 
   const handleServiceSelect = (serviceId: string) => {
@@ -105,11 +175,20 @@ function BookAppointmentPage() {
     }
   }
 
-  const handleDateSelect = (date: string) => {
-    if (date !== selectedDate) {
+  const handleDateSelect = (date: DateOption) => {
+    if (date.value !== selectedDate.value) {
       setSelectedDate(date)
       resetSelectedTime()
     }
+  }
+
+  const handleTimeSelect = (time: string) => {
+    setSelectedTime(time)
+    setIsBookingPrepared(false)
+  }
+
+  const handlePrepareBooking = () => {
+    setIsBookingPrepared(true)
   }
 
   return (
@@ -122,36 +201,58 @@ function BookAppointmentPage() {
           Zakažite termin u nekoliko koraka
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-8 text-stone-300">
-          Odaberite uslugu, frizera i slobodan termin. Ovaj tok je spreman za
-          povezivanje sa backend rezervacijama.
+          Odaberite uslugu, frizera i slobodan termin. Usluge se sada učitavaju
+          iz backend kataloga salona.
         </p>
       </section>
 
-      <ServiceSelection
-        services={services}
-        selectedServiceId={selectedServiceId}
-        onSelect={handleServiceSelect}
-      />
+      {isLoadingServices && (
+        <section className="rounded-[28px] border border-amber-200/10 bg-white/[0.035] p-5 text-sm text-stone-300 backdrop-blur">
+          Učitavanje usluga...
+        </section>
+      )}
+
+      {servicesError && (
+        <section className="rounded-[28px] border border-red-300/20 bg-red-400/10 p-5 text-sm font-semibold text-red-100">
+          {servicesError}
+        </section>
+      )}
+
+      {!isLoadingServices && !servicesError && services.length === 0 && (
+        <section className="rounded-[28px] border border-amber-200/10 bg-white/[0.035] p-5 text-sm text-stone-300 backdrop-blur">
+          Trenutno nema dostupnih usluga.
+        </section>
+      )}
+
+      {!isLoadingServices && !servicesError && services.length > 0 && (
+        <ServiceSelection
+          services={services}
+          selectedServiceId={selectedServiceId}
+          onSelect={handleServiceSelect}
+        />
+      )}
+
       <BarberSelection
         barbers={barbers}
         selectedBarberId={selectedBarberId}
         onSelect={handleBarberSelect}
       />
-      <DateSelection
-        dates={dates}
-        selectedDate={selectedDate}
+      <DateCalendar
+        selectedDate={selectedDate.value}
         onSelect={handleDateSelect}
       />
       <TimeSlotGrid
         slots={timeSlots}
         selectedTime={selectedTime}
-        onSelect={setSelectedTime}
+        onSelect={handleTimeSelect}
       />
       <BookingSummary
         service={selectedService}
         barber={selectedBarber}
-        date={selectedDateOption}
+        date={selectedDate}
         time={selectedTime}
+        isPrepared={isBookingPrepared}
+        onConfirm={handlePrepareBooking}
       />
     </div>
   )

@@ -7,7 +7,7 @@ import {
 } from '../../api/authApi'
 import { useAuthUser } from '../../hooks/useAuthUser'
 import {
-  clientNavigationGroups,
+  getNavigationForRole,
   pageMetadata,
 } from '../../routes/appNavigation'
 import AppSidebar from './AppSidebar'
@@ -16,8 +16,9 @@ import Topbar from './Topbar'
 function MainFrame() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { user } = useAuthUser()
+  const { user, primaryRole } = useAuthUser()
   const hasToken = Boolean(getStoredAccessToken())
+  const { navigationGroups, workspaceLabel } = getNavigationForRole(primaryRole)
 
   useEffect(() => {
     if (!hasToken) {
@@ -50,7 +51,8 @@ function MainFrame() {
     <main className="min-h-screen overflow-x-hidden bg-[#06110d] text-stone-100">
       <div className="min-h-screen min-w-0 lg:pl-[280px]">
         <AppSidebar
-          navigationGroups={clientNavigationGroups}
+          navigationGroups={navigationGroups}
+          workspaceLabel={workspaceLabel}
         />
 
         <section className="relative min-w-0 overflow-hidden">
